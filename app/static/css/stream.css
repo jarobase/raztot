@@ -440,10 +440,11 @@ body {
 }
 
 .media-buttons {
+    width: 50%;
     display: block;
     margin: auto;
     height: fit-content;
-    width: 720px;
+    max-width: 850px;
 }
 
 @media (max-height: 1280px) {
@@ -455,7 +456,15 @@ body {
         width: 720px;
         height: 405px;
     }
-    .media-buttons {
-        width: 720px;
-    }
+}
+
+#swipe-box {
+  width: 400px;
+  height: 400px;
+  border: 4px dotted white;
+}
+
+#swipe-info {
+  text-align: center;
+  margin-top: 40%;
 }
