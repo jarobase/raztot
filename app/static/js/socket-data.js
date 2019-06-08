@@ -23,7 +23,7 @@ $(document).ready(function () {
             up: direction == MOVE_UP ? 1 : 0,
             right: direction == MOVE_RIGHT ? 1 : 0,
             down: direction == MOVE_DOWN ? 1 : 0
-        }
+        });
     }
 
     // Keyboard controls
@@ -49,8 +49,9 @@ $(document).ready(function () {
     }
 
     sb.addEventListener("touchstart", function(e){
-        xAxis.downX = e.clientX;
-        yAxis.downY = e.clientY;
+        e.preventDefault();
+        xAxis.downX = e.touches[0].clientX;
+        yAxis.downY = e.touches[0].clientY;
         isMoving = true;
     });
 
@@ -60,13 +61,14 @@ $(document).ready(function () {
     }
 
     // Check for direction of user's swiping
-    sb.addEventListener("touchmove", function(e){
+    sb.addEventListener("touchmove", function(e) {
+        e.preventDefault();
         if (!isMoving) {
             return;
         }
 
-        xAxis.upX = e.clientX;
-        yAxis.upY = e.clientY;
+        xAxis.upX = e.touches[0].clientX;
+        yAxis.upY = e.touches[0].clientY;
 
         var differenceX;
         var differenceY;

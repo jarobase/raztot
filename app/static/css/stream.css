@@ -447,6 +447,21 @@ body {
     max-width: 850px;
 }
 
+#swipe-box {
+    width: 400px;
+    height: 400px;
+    display: none;
+    margin: auto;
+    border: 4px dotted white;
+}
+
+#swipe-info {
+    text-align: center;
+    margin-top: 40%;
+    color: white;
+    font-family: 'Roboto Condensed', sans-serif;
+}
+
 @media (max-height: 1280px) {
     #stream-object {
         width: 720px;
@@ -458,13 +473,8 @@ body {
     }
 }
 
-#swipe-box {
-  width: 400px;
-  height: 400px;
-  border: 4px dotted white;
-}
-
-#swipe-info {
-  text-align: center;
-  margin-top: 40%;
+@media screen and (orientation:portrait) {
+    #swipe-box {
+        display: block;
+    }
 }
