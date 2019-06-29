@@ -48,7 +48,7 @@ else
     sudo pkill janus
     sleep 0.5
     echo "Using api key: $RANDOM_KEY"
-    sudo /opt/janus/bin/janus -a $RANDOM_KEY &
+    sudo /usr/bin/janus -a $RANDOM_KEY &
 fi
 
 python server.py

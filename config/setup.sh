@@ -32,6 +32,9 @@ done
 
 echo -e "${green}${bold}\nInstalling pre-requisites...${normal}${nc}"
 
+DEBIAN=0
+if [ $DEBIAN == 1 ]
+then 
 # Janus related requirements
 sudo apt-get -y install libmicrohttpd-dev libjansson-dev libssl-dev libsrtp-dev libffi-dev libsofia-sip-ua-dev libglib2.0-dev libopus-dev libogg-dev libcurl4-openssl-dev liblua5.2-dev libconfig-dev pkg-config gengetopt libtool automake gtk-doc-tools
 
@@ -41,7 +44,9 @@ sudo apt-get -y install pigpio
 
 # Video streaming requirements
 sudo apt-get -y install libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-pulseaudio
-
+fi
+if [ $DEBIAN == 1 ]
+then
 # (Recommended) Install OpenSSL 1.1.1
 OPENSSL_VERSION=$(openssl version | cut -d ' ' -f 2 | tr -dc '0-9')
 if [ $OPENSSL_VERSION -lt 111 ]; then
@@ -62,7 +67,7 @@ if [ $OPENSSL_VERSION -lt 111 ]; then
         rm -rf openssl-1.1.1*
     fi
 fi
-
+fi
 # Generate self-signed certificates
 if [ ! -f "../app/server.crt" ] && [ ! -f "../app/server.key" ]; then
     echo -e "\n${green}${bold}Generating self signed certificates...${normal}${nc}"
@@ -71,17 +76,14 @@ if [ ! -f "../app/server.crt" ] && [ ! -f "../app/server.key" ]; then
 fi
 
 # NGINX setup
-if [ ! -d "/etc/nginx/" ]; then 
-    sudo apt-get -y install nginx
+    #sudo apt-get -y install nginx
     sudo cp $SCRIPT_DIR/../app/server.crt /etc/nginx/
     sudo cp $SCRIPT_DIR/../app/server.key /etc/nginx/
-    sudo /etc/init.d/nginx start
     sudo cp nginx_server.conf /etc/nginx/sites-available/default
-    sudo /etc/init.d/nginx restart
-else
-    echo -e "\n${green}${bold}NGINX already set up.\n${normal}${nc}"
-fi
+    sudo systemctl restart nginx.service
 
+if [ $DEBIAN == 1 ]
+then
 # Install libsrtp2
 if [ ${reqs[libsrtp2]} -eq 0 ]; then
     echo -e "\n${green}${bold}Installing libsrtp2...\n${normal}${nc}"
@@ -128,7 +130,9 @@ if [ ! -d "/opt/janus/" ]; then
 else
     echo -e "\n${green}${bold}Janus Gateway already installed.\n${normal}${nc}--- Streaming configurations are located in /opt/janus/etc/janus/"
 fi
-
+fi
+if [ $DEBIAN == 1 ]
+then
 # Install rpicamsrc
 if ! gst-inspect-1.0 | grep -q "rpicamsrc"; then
     sudo apt-get -y install autoconf automake libtool pkg-config libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libraspberrypi-dev
@@ -142,7 +146,9 @@ if ! gst-inspect-1.0 | grep -q "rpicamsrc"; then
 else
     echo -e "\n${green}${bold}Already have rpicamsrc!${normal}${nc}"
 fi
-
+fi
+if [ $DEBIAN == 1 ]
+then
 # Set up virtual environment
 if [ ! -d "$SCRIPT_DIR/../venv" ]; then
     echo -e "${green}${bold}\nSetting up python virtual environment...${normal}${nc}"
@@ -152,7 +158,7 @@ fi
 # Install all python requirements
 echo -e "${green}${bold}\nInstalling required python libraries...${normal}${nc}"
 $SCRIPT_DIR/../venv/bin/pip3 install -r requirements.txt
-
+fi
 source $SCRIPT_DIR/../venv/bin/activate
 
 # Setting up user account / database
