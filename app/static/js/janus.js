@@ -200,6 +200,7 @@ Janus.dataChanDefaultLabel = "JanusDataChannel";
 
 // Initialization
 Janus.init = function(options) {
+    debug: true;
 	options = options || {};
 	options.callback = (typeof options.callback == "function") ? options.callback : Janus.noop;
 	if(Janus.initDone === true) {

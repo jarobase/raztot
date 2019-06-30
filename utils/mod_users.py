@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 '''
 This script lists, adds, and deletes users based on the command line
 arguments provided. Currently, users can be marked as "admin", which allows

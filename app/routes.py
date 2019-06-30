@@ -1,14 +1,13 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 from app import app
 
 import functools
-import pigpio
-import shutil
 import json
 from os import listdir
 import os
 import psutil
 from utils.custom_autodoc import CustomAutodoc as Autodoc
+from utils.utils import get_cpu_temperature
 from flask import Flask, render_template, send_from_directory, after_this_request, json, request, flash, redirect, Response, make_response, send_file, session
 from functools import wraps
 import signal
@@ -28,6 +27,10 @@ from app.models import LoginForm
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
+import logging
+logging.basicConfig(level=logging.ERROR)
+logger = logging.getLogger('server')
+
 from gevent import monkey
 monkey.patch_all()
 
@@ -44,11 +47,12 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # turn the flask app into a socketio app
 socketio = SocketIO(app)
-pi = pigpio.pi()
 
 # GPIO pins for servos
 SERVO_L = 17
 SERVO_R = 22
+
+
 
 
 def get_status():
@@ -68,10 +72,19 @@ def get_status():
     data['used'] = used
     data['percent'] = percent
     data['acq_size'] = image_count
-    data['camera_status'] = 'detected=1' in subprocess.check_output(
-        'vcgencmd get_camera'.split()).decode('utf-8')
-    data['temp'] = subprocess.check_output(
-        'vcgencmd measure_temp'.split()).decode('utf-8').replace('temp=', '')
+    try:
+        data['camera_status'] = 'detected=1' in subprocess.check_output(
+            'vcgencmd get_camera'.split()).decode('utf-8')
+        data['temp'] = subprocess.check_output(
+            'vcgencmd measure_temp'.split()).decode('utf-8').replace('temp=', '')
+    except FileNotFoundError:
+
+        data['camera_status'] = os.path.exists('/dev/video0') or os.path.exists('/dev/video1')
+        try:
+            data['temp'] = get_cpu_temperature()
+        except FileNotFoundError:
+            data['temp'] = 999
+
     return json.dumps(data)
 
 
@@ -235,7 +248,7 @@ def authenticated_only(f):
 @socketio.on('connect', namespace='/raztot')
 @authenticated_only
 def socket_connect():
-    print('##### CONNECTED ####')
+    logger.error('##### CONNECTED ####')
 
 
 @socketio.on('poll', namespace='/raztot')
@@ -256,22 +269,17 @@ def move(data):
     opposite for reversing. Turning is accomplished by moving the opposite wheel (turning left moves the right wheel and uses the left wheel as a pivot, and vice versa).
     '''
     if data is None:
-        pi.set_servo_pulsewidth(SERVO_L, 0)
-        pi.set_servo_pulsewidth(SERVO_R, 0)
+        logger.error("No communication set for data none")
     elif data.get('left') or data.get('right'):
-        pi.set_servo_pulsewidth(SERVO_L, data.get('left') * 1000)
-        pi.set_servo_pulsewidth(SERVO_R, data.get('right') * 2000)
+        logger.error("No communication set for LEFT")
     else:
-        pi.set_servo_pulsewidth(SERVO_L, 2000 if data.get(
-            'up') else 1000 * data.get('down'))
-        pi.set_servo_pulsewidth(SERVO_R, 1000 if data.get(
-            'up') else 2000 * data.get('down'))
+        logger.error("No communication set for RIGHT")
 
 
 @socketio.on('disconnect', namespace='/raztot')
 @authenticated_only
 def socket_disconnect():
-    print('!!!! DISCONNECTED !!!!')
+    logger.error('!!!! DISCONNECTED !!!!')
 
 
 ############################################################
