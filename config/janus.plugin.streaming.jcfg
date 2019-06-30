@@ -90,7 +90,7 @@ general: {
 raztot-streaming: {
 	type = "rtp"
 	id = 222
-	description = "RazTot streaming of RTSP feed from onboard camera (using raspivid)"
+	description = "Agayon streaming of RTSP feed from onboard camera (using v4l2src). (RazTot project)"
 	audio = false
 	video = true
 	videoport = 8004
